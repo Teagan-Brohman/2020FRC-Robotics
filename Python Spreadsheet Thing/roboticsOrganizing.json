@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "robotics-organi",
+  "private_key_id": "4bbe691d91460a45f7a26623f10f526ec36f6a3e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCb1V0hJ+bNVK2p\nmTkhpEzFBWwYdjRH64kzYBRrZ2yKFr5V2J6tP//zssfMEZUVWxMXyHl95O9QhtLS\nmMqhjTO7Do2wIG3zqz1+qc+fBLyyvsqQan4P7sBxwNv9Qfhj3tmW5wnAhDYpwnuu\nIITJHhpNCuSpmRm5rFZuPW5Ed6c+3GBW+FbakhIGU4Xi2yF7FgHB4ESBbSLk46Zv\nb4m9htRJ6j4aHPbDb+AJqzNKp4mVhl0IrhAjV85zmqVyNbC9FXdRgyb+H/vzMFCD\nFPllhtztXYH+xolx+WzQkf6sSL5kyeqaQxNsdkbbSoNj6HxkBtxqVka1aLNauF5B\nDccrgUmvAgMBAAECggEABMPDgF8xH5JuaZLy8WmNzrEJlZPjqav00CUowAHztSMt\n4v+9FkywfZniobA17+cO0I7Y0XXIWsd3NxOPOoelOcZ0+Zom59OSt/E8P79MKmZK\nrkYQoFnAo5nDKt1eBBENHnU7p0RuSDJB8tiGsYQ3R1IachRpeh5gBCiNBbs82gn5\nuzdLAzTMKsjpMqAbjImO0yhEjMSp5r5oi+2ak2HeyHuHvlZzmQ/9J7CGMHg8IO6g\nwVYscIBcbJ7ftrofYsLEUp3YMlRCJt7OrmQr+zHYvWljLelxj8FedO0VGLYMqb5A\nGMjUOw47edn/Q8EdY3zsFERWQBsIODIvXvHzoPBVYQKBgQDN2v33m5xiw3YtTbsD\npvZBe90gzPCe9TRGItOYrGRYyqXnbX/sJFeYPgzBPgpbeHuqdkFsnvOZEtRlRgpl\nYLTT5hNoak7Mu+m01hT7aVfc3SCgjEAJHhKVxMnFhoVewO8mA2My1c2Hk4tsTkVU\nOPJ4IIcgMwHtGuQUix2QcOoTzwKBgQDBywi3HsooV1v/BYLObnstbx3FcDzkmEhD\nEHBFLJZxD7JZdYwfRf7vlDbUjJzu8ECLL3HMgRLxxtALi7rFMLVUT8GS/aAbi+XD\nXGe+3qxAUAOSIxatJPXoyZ8KZOtghKwNIObxyUwpy8jpl8V2UeuLSxjytkbLSa23\n99GbZIKEIQKBgQCmXoS+5u6/C0WpW5b3XqrLRbXzWm5lqbqzrFXioAEBmdX3chHe\n4YhBrHRWgTORtZAMtkIt7VDmt8ccijzAriW2081/p9tDr+MzmYmfnwW5pKVH29Gt\nDLbsf/yqPQvxBnDBAh/b59uR5Pbbc26ooNWlrHRI27CE1iTbTYt5PyiPFQKBgB6d\nJV5QRd1Dl6vcwgI8X8cYo5paFbSC/f9iLGoxFf78XM9XC3CxTQmp31OKdwwj9f5G\n23JT/ZsmLh100GdwP2T3SHwhBtbzLbPD+Dulz45FVZsTYfSuPw6sMyygLrLLoqZc\nST9u7lI3+CA2sqHzZQNXNLS66MoadI/4XStwIFIhAoGBAJxUyGiZ7TXhAJBVsHTs\nyPT7y02zC8qsaoOVUMq9ZBfj6iTtdjdcqpudatLUdaetSrSyWUQptq8wTaqTwNQm\n3YftpjY/sg3oZc8K+EgZ6r1uv/VkH9YgYDxoIN6SJwbOalYm4rCfG4QzIKKqPDFP\nq/RyYC8dFTuljT+pK8/PnqoQ\n-----END PRIVATE KEY-----\n",
+  "client_email": "search-send@robotics-organi.iam.gserviceaccount.com",
+  "client_id": "108196771251869979840",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/search-send%40robotics-organi.iam.gserviceaccount.com"
+}
