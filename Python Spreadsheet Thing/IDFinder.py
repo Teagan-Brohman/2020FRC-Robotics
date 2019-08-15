@@ -19,78 +19,101 @@ while exitFlag == False:
 
     selection = input('Would You Like To Find Something or Make Something New? (Find, New) ')
 
-    if selection.casefold() in ['find', 'Find']:
+    if selection.casefold().strip() in ['find', 'Find']:
         selection = input("What Do You Need To Find? (Name, CanID, PortNum, IPAddress) ")
 
-        if selection.casefold() in ['canid', 'CanID']:
+        if selection.casefold().strip() in ['canid', 'CanID']:
             canIDselect = input("What CanID are you looking for? ")
             try:
                 cell = sheet.find(canIDselect)
-                print("Found Something At R%sC%s" % (cell.row, cell.col))
-                values_list = sheet.row_values(cell.row)
-                print(values_list)
+                if cell.col == 3:
+                    print("Found Something At R%sC%s" % (cell.row, cell.col))
+                    values_list = sheet.row_values(cell.row)
+                    print(values_list)
+                else:
+                    raise gspread.exceptions.CellNotFound
             except gspread.exceptions.CellNotFound:
                 print("Could Not Find Anything, Sorry!")
 
-        elif selection.casefold() in ['portnum', 'PortNum']:
+        elif selection.casefold().strip() in ['portnum', 'PortNum']:
             portNumselect = input('What Port Number Are You Looking For? ')
             try:
                 cell = sheet.find(portNumselect)
-                print('Found Something At Row %s Column %s' % (cell.row, cell.col))
-                values_list = sheet.row_values(cell.row)
-                print(values_list)
+                if cell.col == 2:
+                    print('Found Something At Row %s Column %s' % (cell.row, cell.col))
+                    values_list = sheet.row_values(cell.row)
+                    print(values_list)
+                else:
+                    raise gspread.exceptions.CellNotFound
             except gspread.exceptions.CellNotFound:
                 print("Could Not Find Anything, Sorry!")
 
-        elif selection.casefold() in ['ip', "IP"]:
+        elif selection.casefold().strip() in ['ip', "IP"]:
             IPNumselect = input('What IP Address Are You Looking For? ')
             try:
                 cell = sheet.find(IPNumselect)
-                print('Found Something At Row %s Column %s' % (cell.row, cell.col))
-                values_list = sheet.row_values(cell.row)
-                print(values_list)
+                if cell.col == 3:
+                    print('Found Something At Row %s Column %s' % (cell.row, cell.col))
+                    values_list = sheet.row_values(cell.row)
+                    print(values_list)
+                else:
+                    raise gspread.exceptions.CellNotFound
             except gspread.exceptions.CellNotFound:
                 print("Could Not Find Anything, Sorry!")
 
-        elif selection.casefold() in ['name', "Name"]:
+        elif selection.casefold().strip() in ['name', "Name"]:
             nameSelect = input('What Name Are You Looking For? ')
             try:
                 cell = sheet.find(nameSelect)
-                print('Found Something At Row %s Column %s' % (cell.row, cell.col))
-                values_list = sheet.row_values(cell.row)
-                print(values_list)
+                if cell.col == 1:
+                    print('Found Something At Row %s Column %s' % (cell.row, cell.col))
+                    values_list = sheet.row_values(cell.row)
+                    print(values_list)
+                else:
+                    raise gspread.exceptions.CellNotFound
             except gspread.exceptions.CellNotFound:
                 print("Could Not Find Anything, Sorry!")
 
         else:
             exit()
 
-    elif selection.casefold() in ['new', 'New']:
+    elif selection.casefold().strip() in ['new', 'New']:
         newName = input("What is the name of the new object? ")
         newPort = input("What is the port id? ")
         newIP = input("What is the IP, put N/A if not possible? ")
         newCANID = input("What is the CAN ID of the object? ")
 
         try:
-            cell = sheet.find(newName)
-            print("There is already an object with the same name")
+            cell = sheet.find(newName.strip())
+            if cell.col == 1:
+                print("There is already an object with the same name")
 
         except gspread.exceptions.CellNotFound:
+            print("Name Clear")
             try:
-                cell = sheet.find(newPort)
-                print("There is already a object with the same port")
+                cell = sheet.find(newPort.strip())
+                if cell.col == 2:
+                    print("There is already a object with the same port")
+
             except gspread.exceptions.CellNotFound:
+                print("Port Clear")
                 try:
-                    if newIP.casefold() in ['n/a', 'na']:
+                    if newIP.casefold().strip() in ['n/a', 'na']:
                         raise gspread.exceptions.CellNotFound
                     else:
-                        cell = sheet.find(newIP)
-                        print("There is already an object with this IP")
+                        cell = sheet.find(newIP.strip())
+                        if cell.col == 3:
+                            print("There is already an object with this IP")
+
                 except gspread.exceptions.CellNotFound:
+                    print("IP Clear")
                     try:
-                        cell = sheet.find(newCANID)
-                        print("There is already an object with this CAN ID")
+                        cell = sheet.find(newCANID.strip())
+                        if cell.col == 4:
+                            print("There is already an object with this CAN ID")
+
                     except gspread.exceptions.CellNotFound:
+                        print("CANID Clear")
                         print("No repeats found, adding new object...")
 
                         row = [newName,newPort,newIP,newCANID]
