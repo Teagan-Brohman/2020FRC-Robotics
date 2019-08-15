@@ -87,6 +87,8 @@ while exitFlag == False:
             cell = sheet.find(newName.strip())
             if cell.col == 1:
                 print("There is already an object with the same name")
+            else:
+                raise gspread.exceptions.CellNotFound
 
         except gspread.exceptions.CellNotFound:
             print("Name Clear")
@@ -94,6 +96,9 @@ while exitFlag == False:
                 cell = sheet.find(newPort.strip())
                 if cell.col == 2:
                     print("There is already a object with the same port")
+
+                else:
+                    raise gspread.exceptions.CellNotFound
 
             except gspread.exceptions.CellNotFound:
                 print("Port Clear")
@@ -104,6 +109,8 @@ while exitFlag == False:
                         cell = sheet.find(newIP.strip())
                         if cell.col == 3:
                             print("There is already an object with this IP")
+                        else:
+                            raise gspread.exceptions.CellNotFound
 
                 except gspread.exceptions.CellNotFound:
                     print("IP Clear")
@@ -111,15 +118,17 @@ while exitFlag == False:
                         cell = sheet.find(newCANID.strip())
                         if cell.col == 4:
                             print("There is already an object with this CAN ID")
+                        else:
+                            raise gspread.exceptions.CellNotFound
 
                     except gspread.exceptions.CellNotFound:
                         print("CANID Clear")
                         print("No repeats found, adding new object...")
 
-                        row = [newName,newPort,newIP,newCANID]
+                        row = [newName.casefold().strip(),newPort.casefold().strip(),newIP.casefold().strip(),newCANID.casefold().strip()]
                         index = 2
                         sheet.insert_row(row, index)
-
+                    
 
 
 
