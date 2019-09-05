@@ -7,21 +7,33 @@
 
 package frc.robot;
 
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SensorType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 public class Robot extends TimedRobot {
   private DifferentialDrive m_myRobot;
   private Joystick m_leftStick;
   private Joystick m_rightStick;
-  private static final int leftDeviceID = 1; 
-  private static final int rightDeviceID = 2;
-  private CANSparkMax m_leftMotor;
-  private CANSparkMax m_rightMotor;
+  private static final int leftFrontDeviceID = 1; 
+  private static final int leftBackDeviceID = 2;
+  private static final int rightFrontDeviceID = 3;
+  private static final int rightBackDeviceID = 4;
+  private CANSparkMax m_leftFrontMotor;
+  private CANSparkMax m_leftBackMotor;
+  private CANSparkMax m_rightFrontMotor;
+  private CANSparkMax m_rightBackMotor;
+  private CANEncoder m_leftBackEncoder;
+  private CANEncoder m_leftFrontEncoder;
+  private CANEncoder m_rightBackEncoder;
+  private CANEncoder m_rightFrontEncoder;
 
   @Override
   public void robotInit() {
@@ -38,26 +50,40 @@ public class Robot extends TimedRobot {
    * The example below initializes four brushless motors with CAN IDs 1 and 2. Change
    * these parameters to match your setup
    */
-    m_leftMotor = new CANSparkMax(leftDeviceID, MotorType.kBrushless);
-    m_rightMotor = new CANSparkMax(rightDeviceID, MotorType.kBrushless);
-
+    m_leftFrontMotor = new CANSparkMax(leftFrontDeviceID, MotorType.kBrushless);
+    m_leftBackMotor = new CANSparkMax(leftBackDeviceID, MotorType.kBrushless);
+    m_rightFrontMotor = new CANSparkMax(rightFrontDeviceID, MotorType.kBrushless);
+    m_rightBackMotor = new CANSparkMax(rightBackDeviceID, MotorType.kBrushless);
+    
+    m_leftFrontEncoder = m_leftFrontMotor.getEncoder();
+    m_leftBackEncoder = m_leftBackMotor.getEncoder();
+    m_rightFrontEncoder = m_rightFrontMotor.getEncoder();
+    m_rightBackEncoder = m_rightBackMotor.getEncoder();
+    
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
      * in the SPARK MAX to their factory default state. If no argument is passed, these
      * parameters will not persist between power cycles
      */
-    m_leftMotor.restoreFactoryDefaults();
-    m_rightMotor.restoreFactoryDefaults();
+    // m_leftMotor.restoreFactoryDefaults();
+    // m_rightMotor.restoreFactoryDefaults();
 
-    m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
+   // m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
     m_leftStick = new Joystick(0);
     //m_rightStick = new Joystick(0);
+    
   }
 
   @Override
   public void teleopPeriodic() {
-    m_myRobot.tankDrive(1, m_leftStick.getZ());
-
+    //m_myRobot.tankDrive(m_leftStick.getX(), m_leftStick.getZ());
+    m_leftFrontMotor.set(m_leftStick.getY());
+    m_leftBackMotor.set(m_leftStick.getY());
+    m_rightFrontMotor.set(m_leftStick.getZ());
+    m_rightBackMotor.set(m_leftStick.getZ());
+    //System.out.println(m_leftStick.getX());
+    //System.out.println(m_rightEncoder.getPosition());
+    
   }
 }
