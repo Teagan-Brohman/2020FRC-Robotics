@@ -15,11 +15,14 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.AnalogGyro;
+
 
 
 public class Robot extends TimedRobot {
-  private DifferentialDrive m_myRobot;
+  private MecanumDrive m_myRobot;
   private Joystick m_leftStick;
   private Joystick m_rightStick;
   private static final int leftFrontDeviceID = 1; 
@@ -34,6 +37,14 @@ public class Robot extends TimedRobot {
   private CANEncoder m_leftFrontEncoder;
   private CANEncoder m_rightBackEncoder;
   private CANEncoder m_rightFrontEncoder;
+  private static final int kGyroPort = 0;
+
+  private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+
+  public double yValue;
+  public double xValue;
+  public float leftPower;
+  public float rightPower;
 
   @Override
   public void robotInit() {
@@ -68,6 +79,8 @@ public class Robot extends TimedRobot {
     // m_leftMotor.restoreFactoryDefaults();
     // m_rightMotor.restoreFactoryDefaults();
 
+    
+      m_myRobot = new MecanumDrive(m_leftFrontMotor, m_leftBackMotor, m_rightFrontMotor, m_rightBackMotor);
    // m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
     m_leftStick = new Joystick(0);
@@ -77,11 +90,20 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
+    yValue = m_leftStick.getY();
+    xValue = m_leftStick.getX();
+
+
+
+    m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), m_gyro.getAngle());
+
+
     //m_myRobot.tankDrive(m_leftStick.getX(), m_leftStick.getZ());
-    m_leftFrontMotor.set(m_leftStick.getY());
-    m_leftBackMotor.set(m_leftStick.getY());
-    m_rightFrontMotor.set(m_leftStick.getZ());
-    m_rightBackMotor.set(m_leftStick.getZ());
+    // m_leftFrontMotor.set(m_leftStick.getY());
+    // m_leftBackMotor.set(m_leftStick.getY());
+    // m_rightFrontMotor.set(m_leftStick.getZ());
+    // m_rightBackMotor.set(m_leftStick.getZ());
     //System.out.println(m_leftStick.getX());
     //System.out.println(m_rightEncoder.getPosition());
     
