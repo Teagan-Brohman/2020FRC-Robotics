@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
   private CANSparkMax m_rightFrontMotor;
   private CANSparkMax m_rightBackMotor;
   private CANEncoder m_leftBackEncoder;
-  private CANEncoder m_leftFrontEncoder;
+  private CANEncoder m_leftFrontEncoder;                                                                                 
   private CANEncoder m_rightBackEncoder;
   private CANEncoder m_rightFrontEncoder;
   private static final int kGyroPort = 0;
@@ -62,13 +62,9 @@ public class Robot extends TimedRobot {
   }
        */ 
 
-  
-
   @Override
   public void robotInit() {
 
-  
-   
   /**
    * SPARK MAX controllers are intialized over CAN by constructing a CANSparkMax object
    * 
@@ -87,7 +83,7 @@ public class Robot extends TimedRobot {
     m_rightFrontMotor = new CANSparkMax(rightFrontDeviceID, MotorType.kBrushless);
     m_rightBackMotor = new CANSparkMax(rightBackDeviceID, MotorType.kBrushless);
     
-    m_leftFrontEncoder = m_leftFrontMotor.getEncoder();
+    m_leftBackEncoder = m_leftFrontMotor.getEncoder();
     m_leftBackEncoder = m_leftBackMotor.getEncoder();
     m_rightFrontEncoder = m_rightFrontMotor.getEncoder();
     m_rightBackEncoder = m_rightBackMotor.getEncoder();
@@ -104,7 +100,7 @@ public class Robot extends TimedRobot {
       m_myRobot = new MecanumDrive(m_leftFrontMotor, m_leftBackMotor, m_rightFrontMotor, m_rightBackMotor);
    // m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
-    m_leftStick = new Joystick(0);
+    m_leftStick = new Joystick(0); 
     //m_rightStick = new Joystick(0);
 
     try {
@@ -134,12 +130,20 @@ public class Robot extends TimedRobot {
     DriverStation.reportError("Error communicating with drive system:  " + ex.getMessage(), true);
     }
     
-    SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
-    SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
-    SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
-    SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
-    SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
+    // SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
+    // SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
+    // SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
+    // SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
+    // SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
+    
+    SmartDashboard.putNumber("Front Left", m_leftFrontEncoder.getPosition());
+    SmartDashboard.putNumber("Front Right", m_rightFrontEncoder.getPosition());
+    SmartDashboard.putNumber("Back Left", m_leftBackEncoder.getPosition());
+    SmartDashboard.putNumber("Back Right", m_rightBackEncoder.getPosition());
+    
            
+
+    SmartDashboard.updateValues();
     //m_myRobot.tankDrive(m_leftStick.getX(), m_leftStick.getZ());
     // m_leftFrontMotor.set(m_leftStick.getY());
     // m_leftBackMotor.set(m_leftStick.getY());
@@ -147,8 +151,5 @@ public class Robot extends TimedRobot {
     // m_rightBackMotor.set(m_leftStick.getZ());
     //System.out.println(m_leftStick.getX());
     //System.out.println(m_rightEncoder.getPosition());
-    
-
-      
   }
 }

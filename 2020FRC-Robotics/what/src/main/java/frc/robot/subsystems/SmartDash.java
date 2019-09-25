@@ -1,4 +1,5 @@
-package frc.robot;
+package frc.robot.subsystems;
+
 
 import com.kauailabs.navx.frc.AHRS;
 import com.kauailabs.navx.frc.AHRS.SerialDataType;
