@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 
+import frc.robot.subsystems.SmartDash;
+
 
 
 
@@ -87,6 +89,8 @@ public class Robot extends TimedRobot {
     m_leftBackEncoder = m_leftBackMotor.getEncoder();
     m_rightFrontEncoder = m_rightFrontMotor.getEncoder();
     m_rightBackEncoder = m_rightBackMotor.getEncoder();
+
+    
     
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
@@ -95,11 +99,13 @@ public class Robot extends TimedRobot {
      */
     // m_leftMotor.restoreFactoryDefaults();
     // m_rightMotor.restoreFactoryDefaults();
-
+   
     
       m_myRobot = new MecanumDrive(m_leftFrontMotor, m_leftBackMotor, m_rightFrontMotor, m_rightBackMotor);
    // m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
+    
+  
     m_leftStick = new Joystick(0); 
     //m_rightStick = new Joystick(0);
 
@@ -125,7 +131,9 @@ public class Robot extends TimedRobot {
     /* Use the joystick X axis for lateral movement,            */
     /* Y axis for forward movement, and Z axis for rotation.    */
     /* Use navX MXP yaw angle to define Field-centric transform */
-    m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), ahrs.getAngle());
+    m_myRobot.setRightSideInverted(true);
+    m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), 0);
+    //m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), ahrs.getAngle());
     } catch( RuntimeException ex ) {
     DriverStation.reportError("Error communicating with drive system:  " + ex.getMessage(), true);
     }
@@ -136,11 +144,16 @@ public class Robot extends TimedRobot {
     // SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
     // SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
     
-    SmartDashboard.putNumber("Front Left", m_leftFrontEncoder.getPosition());
-    SmartDashboard.putNumber("Front Right", m_rightFrontEncoder.getPosition());
-    SmartDashboard.putNumber("Back Left", m_leftBackEncoder.getPosition());
-    SmartDashboard.putNumber("Back Right", m_rightBackEncoder.getPosition());
-    
+    // SmartDashboard.putNumber("Front Left", m_leftFrontEncoder.getPosition());
+    // SmartDashboard.putNumber("Front Right", m_rightFrontEncoder.getPosition());
+    // SmartDashboard.putNumber("Back Left", m_leftBackEncoder.getPosition());
+    // SmartDashboard.putNumber("Back Right", m_rightBackEncoder.getPosition());
+
+    SmartDashboard.putNumber("Front Right Power", m_rightFrontEncoder.getVelocity());
+    SmartDashboard.putNumber("Back Right Power", m_rightBackEncoder.getVelocity());
+    // SmartDashboard.putNumber("Front Left Power", m_leftFrontEncoder.getVelocity());
+    // SmartDashboard.putNumber("back Left Power", m_leftBackEncoder.getVelocity());
+    SmartDashboard.putBoolean("Are motors reversed", m_myRobot.isRightSideInverted());
            
 
     SmartDashboard.updateValues();
