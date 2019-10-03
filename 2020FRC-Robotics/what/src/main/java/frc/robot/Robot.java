@@ -15,6 +15,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+
+import edu.wpi.first.wpilibj.Joystick.ButtonType;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,16 +32,14 @@ import frc.robot.subsystems.SmartDash;
 public class Robot extends TimedRobot {
 
   // private AHRS ahrs; 
-  AHRS ahrs = new AHRS(SPI.Port.kMXP);
-  
+  AHRS ahrs;
   private MecanumDrive m_myRobot;
   private Joystick m_leftStick;
-  private Joystick m_rightStick;
-  private Joystick m_joystick1;
+  public static final int kGamepadButtonA = 1;
   private static final int leftFrontDeviceID = 1; 
-  private static final int leftBackDeviceID = 2;
-  private static final int rightFrontDeviceID = 3;
-  private static final int rightBackDeviceID = 5;
+  private static final int leftBackDeviceID = 3;
+  private static final int rightFrontDeviceID = 5;
+  private static final int rightBackDeviceID = 2;
   private CANSparkMax m_leftFrontMotor;
   private CANSparkMax m_leftBackMotor;
   private CANSparkMax m_rightFrontMotor;
@@ -50,19 +50,16 @@ public class Robot extends TimedRobot {
   private CANEncoder m_rightFrontEncoder;
   private static final int kGyroPort = 0;
 
-  private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+  //private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
   
   public double yValue;
   public double xValue;
+  public double zValue;
   public float leftPower;
   public float rightPower;
-
-  /*try {
-    ahrs = new AHRS(SPI.Port.kMXP);
-  } catch (RuntimeException ex ) {
-    DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
-  }
-       */ 
+  public double roboGyro; 
+  
+       
 
   @Override
   public void robotInit() {
@@ -85,6 +82,8 @@ public class Robot extends TimedRobot {
     m_rightFrontMotor = new CANSparkMax(rightFrontDeviceID, MotorType.kBrushless);
     m_rightBackMotor = new CANSparkMax(rightBackDeviceID, MotorType.kBrushless);
     
+    m_myRobot = new MecanumDrive(m_leftFrontMotor, m_leftBackMotor, m_rightFrontMotor, m_rightBackMotor);
+
     m_leftBackEncoder = m_leftFrontMotor.getEncoder();
     m_leftBackEncoder = m_leftBackMotor.getEncoder();
     m_rightFrontEncoder = m_rightFrontMotor.getEncoder();
@@ -99,13 +98,7 @@ public class Robot extends TimedRobot {
      */
     // m_leftMotor.restoreFactoryDefaults();
     // m_rightMotor.restoreFactoryDefaults();
-   
-    
-      m_myRobot = new MecanumDrive(m_leftFrontMotor, m_leftBackMotor, m_rightFrontMotor, m_rightBackMotor);
-   // m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
-    
-  
     m_leftStick = new Joystick(0); 
     //m_rightStick = new Joystick(0);
 
@@ -120,45 +113,65 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    yValue = m_leftStick.getY();
-    xValue = m_leftStick.getX();
-
+    xValue = m_leftStick.getY();
+    yValue = m_leftStick.getX();
+    zValue = m_leftStick.getZ();
     
-// if (m_joystick1.getButton() {
-//                 ahrs.reset();
-//             }
-    try {
-    /* Use the joystick X axis for lateral movement,            */
-    /* Y axis for forward movement, and Z axis for rotation.    */
-    /* Use navX MXP yaw angle to define Field-centric transform */
-    m_myRobot.setRightSideInverted(true);
-    m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), 0);
-    //m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), ahrs.getAngle());
-    } catch( RuntimeException ex ) {
-    DriverStation.reportError("Error communicating with drive system:  " + ex.getMessage(), true);
+    xValue = xValue/2;
+    yValue = yValue/2;
+    zValue = zValue/4;
+
+    if(xValue < 0.05 && xValue > -0.05){
+      xValue = 0;
+    }
+    if(yValue < 0.05 && yValue > -0.05){
+      yValue = 0;
+    }
+    if(zValue < 0.05 && zValue > -0.05){
+      zValue = 0;
     }
     
-    // SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
-    // SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
-    // SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
-    // SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
-    // SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
+    roboGyro = ahrs.getAngle();
+    m_myRobot.driveCartesian(-yValue, xValue, -zValue, -roboGyro);
     
+    
+    
+ if (m_leftStick.getRawButton(3)){
+                 ahrs.reset();
+                 
+             }
+    // try {
+    // /* Use the joystick X axis for lateral movement,            */
+    // /* Y axis for forward movement, and Z axis for rotation.    */
+    // /* Use navX MXP yaw angle to define Field-centric transform */
+    //m_myRobot.setRightSideInverted(false);
+    // //m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), 0);
+    // //m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), ahrs.getAngle());
+    // } catch( RuntimeException ex ) {
+    // DriverStation.reportError("Error communicating with drive system:  " + ex.getMessage(), true);
+    // }
+    
+    SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
+    SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
+    SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
+    SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
+    SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
+    SmartDashboard.putNumber(   "Angle",             ahrs.getAngle());
     // SmartDashboard.putNumber("Front Left", m_leftFrontEncoder.getPosition());
     // SmartDashboard.putNumber("Front Right", m_rightFrontEncoder.getPosition());
     // SmartDashboard.putNumber("Back Left", m_leftBackEncoder.getPosition());
     // SmartDashboard.putNumber("Back Right", m_rightBackEncoder.getPosition());
 
-    SmartDashboard.putNumber("Front Right Power", m_rightFrontEncoder.getVelocity());
-    SmartDashboard.putNumber("Back Right Power", m_rightBackEncoder.getVelocity());
-    // SmartDashboard.putNumber("Front Left Power", m_leftFrontEncoder.getVelocity());
-    // SmartDashboard.putNumber("back Left Power", m_leftBackEncoder.getVelocity());
+    // SmartDashboard.putNumber("Front Right Power", m_rightFrontEncoder.getVelocity());
+    // SmartDashboard.putNumber("Back Right Power", m_rightBackEncoder.getVelocity());
+    // // SmartDashboard.putNumber("Front Left Power", m_leftFrontEncoder.getVelocity());
+    // // SmartDashboard.putNumber("back Left Power", m_leftBackEncoder.getVelocity());
     SmartDashboard.putBoolean("Are motors reversed", m_myRobot.isRightSideInverted());
            
 
     SmartDashboard.updateValues();
     //m_myRobot.tankDrive(m_leftStick.getX(), m_leftStick.getZ());
-    // m_leftFrontMotor.set(m_leftStick.getY());
+     //m_leftFrontMotor.set(m_leftStick.getY());
     // m_leftBackMotor.set(m_leftStick.getY());
     // m_rightFrontMotor.set(m_leftStick.getZ());
     // m_rightBackMotor.set(m_leftStick.getZ());
