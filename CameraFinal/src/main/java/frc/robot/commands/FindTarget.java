@@ -21,6 +21,7 @@ public class FindTarget extends Command {
 
     double tx = Robot.visionSubsystem.getTx();
     double ty = Robot.visionSubsystem.getTy();
+    System.out.println("asdlkfj");
   }
 
   // Make this return true when this Command no longer needs to run execute()

@@ -20,9 +20,10 @@ import edu.wpi.first.wpilibj.Joystick.ButtonType;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+
+import edu.wpi.first.networktables.*;
 
 import frc.robot.subsystems.SmartDash;
 
@@ -48,9 +49,7 @@ public class Robot extends TimedRobot {
   private CANEncoder m_leftFrontEncoder;                                                                                 
   private CANEncoder m_rightBackEncoder;
   private CANEncoder m_rightFrontEncoder;
-  private static final int kGyroPort = 0;
-
-  //private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+ 
   
   public double yValue;
   public double xValue;
@@ -99,7 +98,7 @@ public class Robot extends TimedRobot {
     // m_leftMotor.restoreFactoryDefaults();
     // m_rightMotor.restoreFactoryDefaults();
 
-    m_leftStick = new Joystick(0); 
+    m_leftStick = new Joystick(1); 
     //m_rightStick = new Joystick(0);
 
     try {
@@ -132,7 +131,28 @@ public class Robot extends TimedRobot {
     }
     
     roboGyro = ahrs.getAngle();
-    m_myRobot.driveCartesian(-yValue, xValue, -zValue, -roboGyro);
+
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = table.getEntry("tx");
+    double x = tx.getDouble(0.0);
+    SmartDashboard.putNumber(   "LimelightX",  x);
+
+    if(m_leftStick.getRawButton(1)){ //trigger pressed
+      if(x > 0){
+        m_myRobot.driveCartesian(-(Math.pow((0.025 * x), 2)), 0, 0, -roboGyro);
+      }
+      else if(x < 0){
+        m_myRobot.driveCartesian((Math.pow((0.025 * x), 2)), 0, 0, -roboGyro);
+      }
+      else{
+        m_myRobot.driveCartesian(0, 0, 0, 0);
+      }
+    }
+    else{//Trigger not pressed = normal drive
+      m_myRobot.driveCartesian(-yValue, xValue, -zValue, -roboGyro);
+
+    }
+    
     
     
     
@@ -151,6 +171,8 @@ public class Robot extends TimedRobot {
     // DriverStation.reportError("Error communicating with drive system:  " + ex.getMessage(), true);
     // }
     
+
+
     SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
     SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
     SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
