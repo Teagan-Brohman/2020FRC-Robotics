@@ -22,6 +22,10 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.SolenoidBase;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import edu.wpi.first.networktables.*;
 
@@ -58,7 +62,8 @@ public class Robot extends TimedRobot {
   public float rightPower;
   public double roboGyro; 
   
-       
+  Compressor m_compressor = new Compressor(0);
+  DoubleSolenoid solenoidDouble = new DoubleSolenoid(1, 2);
 
   @Override
   public void robotInit() {
@@ -88,7 +93,9 @@ public class Robot extends TimedRobot {
     m_rightFrontEncoder = m_rightFrontMotor.getEncoder();
     m_rightBackEncoder = m_rightBackMotor.getEncoder();
 
-    
+ 
+    m_compressor.setClosedLoopControl(true);
+
     
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
@@ -130,12 +137,14 @@ public class Robot extends TimedRobot {
       zValue = 0;
     }
     
+
+
     roboGyro = ahrs.getAngle();
 
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx");
+    NetworkTableEntry tx = table.getEntry("tx"); 
     double x = tx.getDouble(0.0);
-    SmartDashboard.putNumber(   "LimelightX",  x);
+    SmartDashboard.putNumber("LimelightX",  x);
 
     if(m_leftStick.getRawButton(1)){ //trigger pressed
       if(x > 0){
@@ -153,7 +162,21 @@ public class Robot extends TimedRobot {
 
     }
     
-    
+
+
+
+
+
+
+    if(m_leftStick.getRawButton(11)){
+      solenoidDouble.set(DoubleSolenoid.Value.kForward);
+    }
+    else if(m_leftStick.getRawButton(12)){
+      solenoidDouble.set(DoubleSolenoid.Value.kReverse);
+    } 
+    else{
+      solenoidDouble.set(DoubleSolenoid.Value.kOff);
+    }
     
     
  if (m_leftStick.getRawButton(3)){
@@ -179,6 +202,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
     SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
     SmartDashboard.putNumber(   "Angle",             ahrs.getAngle());
+
     // SmartDashboard.putNumber("Front Left", m_leftFrontEncoder.getPosition());
     // SmartDashboard.putNumber("Front Right", m_rightFrontEncoder.getPosition());
     // SmartDashboard.putNumber("Back Left", m_leftBackEncoder.getPosition());
@@ -188,8 +212,13 @@ public class Robot extends TimedRobot {
     // SmartDashboard.putNumber("Back Right Power", m_rightBackEncoder.getVelocity());
     // // SmartDashboard.putNumber("Front Left Power", m_leftFrontEncoder.getVelocity());
     // // SmartDashboard.putNumber("back Left Power", m_leftBackEncoder.getVelocity());
-    SmartDashboard.putBoolean("Are motors reversed", m_myRobot.isRightSideInverted());
-           
+    //SmartDashboard.putBoolean("Are motors reversed", m_myRobot.isRightSideInverted());
+
+    SmartDashboard.putBoolean("Compressor Enabled? ", m_compressor.enabled());
+    SmartDashboard.putBoolean("Pressure Switch Open? ", m_compressor.getPressureSwitchValue());
+    SmartDashboard.putNumber("Compressor Current Value: ", m_compressor.getCompressorCurrent());
+   
+    //SmartDashboard.putNumber("Double Solanoid Value ", DoubleSolenoid.Value.kReverse);
 
     SmartDashboard.updateValues();
     //m_myRobot.tankDrive(m_leftStick.getX(), m_leftStick.getZ());
