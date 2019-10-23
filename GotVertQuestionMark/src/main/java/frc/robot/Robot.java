@@ -11,6 +11,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SensorType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -53,7 +54,6 @@ public class Robot extends TimedRobot {
   private CANEncoder m_leftFrontEncoder;                                                                                 
   private CANEncoder m_rightBackEncoder;
   private CANEncoder m_rightFrontEncoder;
- 
   
   public double yValue;
   public double xValue;
@@ -61,6 +61,10 @@ public class Robot extends TimedRobot {
   public float leftPower;
   public float rightPower;
   public double roboGyro; 
+
+  private boolean m_LimelightHasValidTarget = false;
+  private double yPower = 0.0;
+  private double xPower = 0.0;
   
   Compressor m_compressor = new Compressor(0);
   DoubleSolenoid solenoidDouble = new DoubleSolenoid(1, 2);
@@ -92,7 +96,11 @@ public class Robot extends TimedRobot {
     m_leftBackEncoder = m_leftBackMotor.getEncoder();
     m_rightFrontEncoder = m_rightFrontMotor.getEncoder();
     m_rightBackEncoder = m_rightBackMotor.getEncoder();
-
+    
+    m_leftFrontMotor.setIdleMode(IdleMode.kBrake);
+    m_rightFrontMotor.setIdleMode(IdleMode.kBrake);
+    m_leftBackMotor.setIdleMode(IdleMode.kBrake);
+    m_rightBackMotor.setIdleMode(IdleMode.kBrake);
  
     m_compressor.setClosedLoopControl(true);
 
@@ -105,7 +113,6 @@ public class Robot extends TimedRobot {
     // m_leftMotor.restoreFactoryDefaults();
     // m_rightMotor.restoreFactoryDefaults();
 
-  
     m_leftStick = new Joystick(1); 
     //m_rightStick = new Joystick(0);
 
@@ -114,7 +121,6 @@ public class Robot extends TimedRobot {
     } catch (RuntimeException ex ) {
       DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
     }
-
   }
 
   @Override
@@ -137,31 +143,18 @@ public class Robot extends TimedRobot {
     if(zValue < 0.05 && zValue > -0.05){
       zValue = 0;
     }
-    
 
     roboGyro = ahrs.getAngle();
 
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx"); 
-    double x = tx.getDouble(0.0);
-    SmartDashboard.putNumber("LimelightX",  x);
-
     if(m_leftStick.getRawButton(1)){ //trigger pressed
-      if(x > 0){
-        m_myRobot.driveCartesian(-(Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
-      }
-      else if(x < 0){
-        m_myRobot.driveCartesian((Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
-      }
-      else{
-        m_myRobot.driveCartesian(0, 0, 0, 0);
-      }
+      Update_Limelight_Tracking();
+      m_myRobot.driveCartesian(-xPower, -yPower, 0, -roboGyro);
     }
     else{//Trigger not pressed = normal drive
       m_myRobot.driveCartesian(-xValue, yValue, -zValue, -roboGyro);
-
+      Update_Limelight_Tracking();
     }
-  
+    
     if(m_leftStick.getRawButton(11)){
       solenoidDouble.set(DoubleSolenoid.Value.kForward);
     }
@@ -172,23 +165,11 @@ public class Robot extends TimedRobot {
       solenoidDouble.set(DoubleSolenoid.Value.kOff);
     }
     
-    
+  
  if (m_leftStick.getRawButton(3)){
                  ahrs.reset();
                  
              }
-    // try {
-    // /* Use the joystick X axis for lateral movement,            */
-    // /* Y axis for forward movement, and Z axis for rotation.    */
-    // /* Use navX MXP yaw angle to define Field-centric transform */
-    //m_myRobot.setRightSideInverted(false);
-    // //m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), 0);
-    // //m_myRobot.driveCartesian(yValue, xValue, m_leftStick.getZ(), ahrs.getAngle());
-    // } catch( RuntimeException ex ) {
-    // DriverStation.reportError("Error communicating with drive system:  " + ex.getMessage(), true);
-    // }
-    
-
 
     SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
     SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
@@ -196,31 +177,50 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
     SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
     SmartDashboard.putNumber(   "Angle",             ahrs.getAngle());
-
-    // SmartDashboard.putNumber("Front Left", m_leftFrontEncoder.getPosition());
-    // SmartDashboard.putNumber("Front Right", m_rightFrontEncoder.getPosition());
-    // SmartDashboard.putNumber("Back Left", m_leftBackEncoder.getPosition());
-    // SmartDashboard.putNumber("Back Right", m_rightBackEncoder.getPosition());
-
-    // SmartDashboard.putNumber("Front Right Power", m_rightFrontEncoder.getVelocity());
-    // SmartDashboard.putNumber("Back Right Power", m_rightBackEncoder.getVelocity());
-    // // SmartDashboard.putNumber("Front Left Power", m_leftFrontEncoder.getVelocity());
-    // // SmartDashboard.putNumber("back Left Power", m_leftBackEncoder.getVelocity());
-    //SmartDashboard.putBoolean("Are motors reversed", m_myRobot.isRightSideInverted());
-
     SmartDashboard.putBoolean("Compressor Enabled? ", m_compressor.enabled());
     SmartDashboard.putBoolean("Pressure Switch Open? ", m_compressor.getPressureSwitchValue());
     SmartDashboard.putNumber("Compressor Current Value: ", m_compressor.getCompressorCurrent());
-   
-    //SmartDashboard.putNumber("Double Solanoid Value ", DoubleSolenoid.Value.kReverse);
 
     SmartDashboard.updateValues();
-    //m_myRobot.tankDrive(m_leftStick.getX(), m_leftStick.getZ());
-     //m_leftFrontMotor.set(m_leftStick.getY());
-    // m_leftBackMotor.set(m_leftStick.getY());
-    // m_rightFrontMotor.set(m_leftStick.getZ());
-    // m_rightBackMotor.set(m_leftStick.getZ());
-    //System.out.println(m_leftStick.getX());
-    //System.out.println(m_rightEncoder.getPosition());
+  }
+  public void Update_Limelight_Tracking()
+  {
+        // These numbers must be tuned for your Robot!  Be careful!
+        final double xCoef = 0.015;                    // how hard to turn toward the target
+        final double yCoef = 0.025;                    // how hard to drive fwd toward the target
+        final double DESIRED_TARGET_AREA = 13.0;        // Area of the target when the robot reaches the wall
+        final double MAX_DRIVE = 0.2;                   // Simple speed limit so we don't drive too fast
+
+        double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+        double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+        double ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+
+        if (tv < 1.0)
+        {
+          m_LimelightHasValidTarget = false;
+          yPower = 0.0;
+          xPower = 0.0;
+          return;
+        }
+
+        m_LimelightHasValidTarget = true;
+
+        // Start with proportional steering
+        double x = tx * xCoef; 
+        if(x > MAX_DRIVE)
+        {
+          x = MAX_DRIVE;
+        }
+        xPower = x;
+
+        // try to drive forward until the target area reaches our desired area
+        double y = (DESIRED_TARGET_AREA - ta) * yCoef;
+        if (y > MAX_DRIVE) // don't let the robot drive too fast into the goal
+        {
+          y = MAX_DRIVE;
+        }
+        yPower = y;
+        SmartDashboard.putNumber("ta", ta);
+
   }
 }
