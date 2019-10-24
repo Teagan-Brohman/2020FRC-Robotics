@@ -205,14 +205,11 @@ public class Robot extends TimedRobot {
      debugVar = !debugVar;
    }
 
-
-   
-
-    if (debugVar == true){ //Planning on adding a button on the smart dash to enable and disable the code, changing to this array version so we can remove all lines
-                          //on the smartdash board at once. Still have to implement. 
+    if (debugVar == true){ //Planning on adding a button on the smart dash to enable and disable the code(right now its button 7 on joystick), 
+                          //changing to this array version so we can remove all lines on the smartdash board at once. Still have to implement/test. 
       if(dashboardFlag == false){
       for(int i = 0; i < smartdashBooleans.length; i++){ //This is the thing that executes it
-        SmartDashboard.putNumber(smartdashBooleans[i], smartdashPointer[i]);
+        SmartDashboard.putNumber(smartdashBooleans[i], smartdashPointer[i]); //array values from arrays lines 128-150
         dashboardFlag = true;
       }
     }
