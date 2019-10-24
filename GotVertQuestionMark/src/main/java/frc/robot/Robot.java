@@ -217,10 +217,12 @@ public class Robot extends TimedRobot {
     SmartDashboard.updateValues();
   }
   else{ //when debug mode is off this will delete all the stuff off your smartDashboard.
+    if(dashboardFlag == true){
     dashboardFlag = false;
     for(int i = 0; i < smartdashBooleans.length; i++){
     SmartDashboard.delete(smartdashBooleans[i]);
     }
+  }
   }
 }
   public void Update_Limelight_Tracking()
