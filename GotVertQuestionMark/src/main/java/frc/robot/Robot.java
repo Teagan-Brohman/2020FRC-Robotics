@@ -6,31 +6,21 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
-
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SensorType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
-
-import edu.wpi.first.wpilibj.Joystick.ButtonType;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.SolenoidBase;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-
-import edu.wpi.first.networktables.*;
-
-import frc.robot.subsystems.SmartDash;
 
 
 
@@ -68,6 +58,19 @@ public class Robot extends TimedRobot {
   
   Compressor m_compressor = new Compressor(0);
   DoubleSolenoid solenoidDouble = new DoubleSolenoid(1, 2);
+
+  public boolean debugVar = false;
+  public boolean dashboardFlag = false;
+
+  String[] smartdashBooleans;
+  String[] smartdashNumber;
+
+  Double[] smartdashPointer;
+
+  Double gyroConnect = (double) ((boolean) ahrs.isConnected() ? 1 : 0);
+  Double gyroCalibrating = (double) ((boolean)ahrs.isCalibrating() ? 1 : 0);
+  Double compressorEnable = (double) ((boolean)m_compressor.enabled() ? 1 : 0);
+  Double pressureSwitch = (double) ((boolean) m_compressor.getPressureSwitchValue() ? 1 : 0);
 
   @Override
   public void robotInit() {
@@ -121,6 +124,33 @@ public class Robot extends TimedRobot {
     } catch (RuntimeException ex ) {
       DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
     }
+
+      smartdashBooleans = new String[] { //input the name that you want the box to have here.
+        "IMU_Yaw",
+        "IMU_Pitch",
+        "IMU_Roll",
+        "Angle",
+        "IMU_Connected", 
+        "IMU_IsCalibrating",
+        "Compressor Enabled? ",
+        "Pressure Switch Open? ",
+        "Compressor Current Value: "
+      };
+
+      smartdashPointer = new Double[] { //input the value or location of the value here, if boolean or int needs to be cast to double (look above for how to do that)
+        (double)ahrs.getYaw(),
+        (double)ahrs.getPitch(),
+        (double)ahrs.getRoll(),
+        ahrs.getAngle(),
+        gyroConnect,
+        gyroCalibrating,
+        compressorEnable,
+        pressureSwitch,
+        m_compressor.getCompressorCurrent()
+      };
+
+
+
   }
 
   @Override
@@ -170,19 +200,32 @@ public class Robot extends TimedRobot {
                  ahrs.reset();
                  
              }
+             
+   if(m_leftStick.getRawButton(7)){
+     debugVar = !debugVar;
+   }
 
-    SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
-    SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
-    SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
-    SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
-    SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
-    SmartDashboard.putNumber(   "Angle",             ahrs.getAngle());
-    SmartDashboard.putBoolean("Compressor Enabled? ", m_compressor.enabled());
-    SmartDashboard.putBoolean("Pressure Switch Open? ", m_compressor.getPressureSwitchValue());
-    SmartDashboard.putNumber("Compressor Current Value: ", m_compressor.getCompressorCurrent());
+
+   
+
+    if (debugVar == true){ //Planning on adding a button on the smart dash to enable and disable the code, changing to this array version so we can remove all lines
+                          //on the smartdash board at once. Still have to implement. 
+      if(dashboardFlag == false){
+      for(int i = 0; i < smartdashBooleans.length; i++){ //This is the thing that executes it
+        SmartDashboard.putNumber(smartdashBooleans[i], smartdashPointer[i]);
+        dashboardFlag = true;
+      }
+    }
 
     SmartDashboard.updateValues();
   }
+  else{ //when debug mode is off this will delete all the stuff off your smartDashboard.
+    dashboardFlag = false;
+    for(int i = 0; i < smartdashBooleans.length; i++){
+    SmartDashboard.delete(smartdashBooleans[i]);
+    }
+  }
+}
   public void Update_Limelight_Tracking()
   {
         // These numbers must be tuned for your Robot!  Be careful!
