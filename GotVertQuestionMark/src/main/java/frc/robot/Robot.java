@@ -67,10 +67,6 @@ public class Robot extends TimedRobot {
 
   Double[] smartdashPointer;
 
-  Double gyroConnect = (double) ((boolean) ahrs.isConnected() ? 1 : 0);
-  Double gyroCalibrating = (double) ((boolean)ahrs.isCalibrating() ? 1 : 0);
-  Double compressorEnable = (double) ((boolean)m_compressor.enabled() ? 1 : 0);
-  Double pressureSwitch = (double) ((boolean) m_compressor.getPressureSwitchValue() ? 1 : 0);
 
   @Override
   public void robotInit() {
@@ -125,6 +121,11 @@ public class Robot extends TimedRobot {
       DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
     }
 
+    Double gyroConnect = (double)(ahrs.isConnected() ? 1.0 : 0.0);
+    Double gyroCalibrating = (double)(ahrs.isCalibrating() ? 1.0 : 0.0);
+    Double compressorEnable = (double)(m_compressor.enabled() ? 1.0 : 0.0);
+    Double pressureSwitch = (double)(m_compressor.getPressureSwitchValue() ? 1.0 : 0.0);
+
       smartdashBooleans = new String[] { //input the name that you want the box to have here.
         "IMU_Yaw",
         "IMU_Pitch",
@@ -148,9 +149,6 @@ public class Robot extends TimedRobot {
         pressureSwitch,
         m_compressor.getCompressorCurrent()
       };
-
-
-
   }
 
   @Override
@@ -203,34 +201,43 @@ public class Robot extends TimedRobot {
              
    if(m_leftStick.getRawButton(7)){
      debugVar = !debugVar;
+     sleep(400);
    }
 
     if (debugVar == true){ //Planning on adding a button on the smart dash to enable and disable the code(right now its button 7 on joystick), 
                           //changing to this array version so we can remove all lines on the smartdash board at once. Still have to implement/test. 
-      if(dashboardFlag == false){
-      for(int i = 0; i < smartdashBooleans.length; i++){ //This is the thing that executes it
-        SmartDashboard.putNumber(smartdashBooleans[i], smartdashPointer[i]); //array values from arrays lines 128-150
-        dashboardFlag = true;
-      }
-    }
+      //if(dashboardFlag == false){
+      //for(int i = 0; i < smartdashBooleans.length; i++){ //This is the thing that executes it
+        //SmartDashboard.putNumber(smartdashBooleans[i], smartdashPointer[i]);
+        SmartDashboard.putBoolean("test", debugVar);
+        SmartDashboard.updateValues(); //array values from arrays lines 128-150
+       // dashboardFlag = true;
+     // }
+      
+   // }
 
     SmartDashboard.updateValues();
   }
   else{ //when debug mode is off this will delete all the stuff off your smartDashboard.
-    if(dashboardFlag == true){
-    dashboardFlag = false;
-    for(int i = 0; i < smartdashBooleans.length; i++){
-    SmartDashboard.delete(smartdashBooleans[i]);
-    }
-  }
+    //if(dashboardFlag == true){
+    //dashboardFlag = false;
+    //for(int i = 0; i < smartdashBooleans.length; i++){
+    //SmartDashboard.delete(smartdashBooleans[i]);
+    SmartDashboard.delete("test");
+    SmartDashboard.updateValues();
+    //}
+
+    
+ // }
   }
 }
+
   public void Update_Limelight_Tracking()
   {
         // These numbers must be tuned for your Robot!  Be careful!
         final double xCoef = 0.015;                    // how hard to turn toward the target
         final double yCoef = 0.025;                    // how hard to drive fwd toward the target
-        final double DESIRED_TARGET_AREA = 13.0;        // Area of the target when the robot reaches the wall
+        final double DESIRED_TARGET_AREA = 9.0;        // Area of the target when the robot reaches the wall
         final double MAX_DRIVE = 0.2;                   // Simple speed limit so we don't drive too fast
 
         double tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
@@ -260,9 +267,24 @@ public class Robot extends TimedRobot {
         if (y > MAX_DRIVE) // don't let the robot drive too fast into the goal
         {
           y = MAX_DRIVE;
-        }
+        } 
+        // else if(y < 0)
+        // {
+        //   y = 0;
+        // }
         yPower = y;
         SmartDashboard.putNumber("ta", ta);
 
   }
+
+
+
+
+public void sleep(int milliseconds){
+  try {
+    Thread.sleep(milliseconds);
+} catch(InterruptedException e) {
+    System.out.println("got interrupted!");
 }
+}
+} 
