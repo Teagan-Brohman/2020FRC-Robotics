@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.SolenoidBase;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -45,6 +46,7 @@ public class Robot extends TimedRobot {
   private static final int leftBackDeviceID = 3;
   private static final int rightFrontDeviceID = 5;
   private static final int rightBackDeviceID = 2;
+  private static final int kServoID = 7;
   private CANSparkMax m_leftFrontMotor;
   private CANSparkMax m_leftBackMotor;
   private CANSparkMax m_rightFrontMotor;
@@ -53,6 +55,7 @@ public class Robot extends TimedRobot {
   private CANEncoder m_leftFrontEncoder;                                                                                 
   private CANEncoder m_rightBackEncoder;
   private CANEncoder m_rightFrontEncoder;
+  private Servo brahServo;
  
   
   public double yValue;
@@ -64,6 +67,8 @@ public class Robot extends TimedRobot {
   
   Compressor m_compressor = new Compressor(0);
   DoubleSolenoid solenoidDouble = new DoubleSolenoid(1, 2);
+
+  private double servoDegree;
 
   @Override
   public void robotInit() {
@@ -85,6 +90,8 @@ public class Robot extends TimedRobot {
     m_leftBackMotor = new CANSparkMax(leftBackDeviceID, MotorType.kBrushless);
     m_rightFrontMotor = new CANSparkMax(rightFrontDeviceID, MotorType.kBrushless);
     m_rightBackMotor = new CANSparkMax(rightBackDeviceID, MotorType.kBrushless);
+
+    brahServo = new Servo(kServoID);
     
     m_myRobot = new MecanumDrive(m_leftFrontMotor, m_leftBackMotor, m_rightFrontMotor, m_rightBackMotor);
 
@@ -93,7 +100,6 @@ public class Robot extends TimedRobot {
     m_rightFrontEncoder = m_rightFrontMotor.getEncoder();
     m_rightBackEncoder = m_rightBackMotor.getEncoder();
 
- 
     m_compressor.setClosedLoopControl(true);
 
     
@@ -146,6 +152,7 @@ public class Robot extends TimedRobot {
     double x = tx.getDouble(0.0);
     SmartDashboard.putNumber("LimelightX",  x);
 
+
     if(m_leftStick.getRawButton(1)){ //trigger pressed
       if(x > 0){
         m_myRobot.driveCartesian(-(Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
@@ -173,10 +180,27 @@ public class Robot extends TimedRobot {
     }
     
     
- if (m_leftStick.getRawButton(3)){
-                 ahrs.reset();
-                 
-             }
+  if (m_leftStick.getRawButton(3)){
+    ahrs.reset();
+  }
+
+  servoDegree = brahServo.getAngle();
+  if(x > 4){
+    servoDegree += 3;
+    brahServo.setAngle(servoDegree);
+  }
+  if(x < -4){
+    servoDegree -= 3;
+    brahServo.setAngle(servoDegree);
+  }
+  SmartDashboard.putNumber("ServoDegree",  servoDegree);
+  
+  // if(m_leftStick.getRawButton(5)){
+  //   brahServo.setAngle(180);
+  // }             
+  // if(m_leftStick.getRawButton(6)){
+  //   brahServo.setAngle(0);
+  // }
     // try {
     // /* Use the joystick X axis for lateral movement,            */
     // /* Y axis for forward movement, and Z axis for rotation.    */
