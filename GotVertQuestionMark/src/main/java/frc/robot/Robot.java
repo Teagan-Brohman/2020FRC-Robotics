@@ -21,8 +21,11 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.i2cSubclass;
 //import edu.wpi.first.wpilibj.ADXL345_I2C;
 import edu.wpi.first.wpilibj.I2C;
+//import com.revrobotics.*;
+//import com.revrobotics.Rev2mDistanceSensor.Port;
 
 
 
@@ -210,12 +213,13 @@ public class Robot extends TimedRobot {
       //if(dashboardFlag == false){
       //for(int i = 0; i < smartdashBooleans.length; i++){ //This is the thing that executes it
         //SmartDashboard.putNumber(smartdashBooleans[i], smartdashPointer[i]);
-        SmartDashboard.putBoolean("test", debugVar);
-        SmartDashboard.updateValues(); //array values from arrays lines 128-150
+        //SmartDashboard.putBoolean("test", debugVar);
+        //SmartDashboard.updateValues(); //array values from arrays lines 128-150
        // dashboardFlag = true;
      // }
       
    // }
+      i2cSubclass.getRange();
 
     SmartDashboard.updateValues();
   }

@@ -13,6 +13,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SensorType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import org.opencv.video.Video;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -27,7 +29,10 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.SolenoidBase;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoMode;
+import edu.wpi.cscore.VideoMode.PixelFormat;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.*;
 
 import frc.robot.subsystems.SmartDash;
@@ -68,6 +73,9 @@ public class Robot extends TimedRobot {
   Compressor m_compressor = new Compressor(0);
   DoubleSolenoid solenoidDouble = new DoubleSolenoid(1, 2);
 
+  public UsbCamera drive;
+  public VideoMode videoMode;
+
   private double servoDegree;
 
   @Override
@@ -102,6 +110,9 @@ public class Robot extends TimedRobot {
 
     m_compressor.setClosedLoopControl(true);
 
+    drive = CameraServer.getInstance().startAutomaticCapture();
+    videoMode = new VideoMode(PixelFormat.kYUYV, 800, 448, 30);
+    
     
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
@@ -152,6 +163,9 @@ public class Robot extends TimedRobot {
     double x = tx.getDouble(0.0);
     SmartDashboard.putNumber("LimelightX",  x);
 
+    drive.setFPS(30);
+    drive.setVideoMode(videoMode);
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").setNumber(2);
 
     if(m_leftStick.getRawButton(1)){ //trigger pressed
       if(x > 0){
@@ -179,18 +193,21 @@ public class Robot extends TimedRobot {
       solenoidDouble.set(DoubleSolenoid.Value.kOff);
     }
     
-    
   if (m_leftStick.getRawButton(3)){
     ahrs.reset();
   }
 
+
+  if(m_leftStick.getRawButton(9)){
+    brahServo.setAngle(90);
+  }
   servoDegree = brahServo.getAngle();
   if(x > 4){
-    servoDegree += 3;
+    servoDegree += Math.abs(x/10);//.8
     brahServo.setAngle(servoDegree);
   }
   if(x < -4){
-    servoDegree -= 3;
+    servoDegree -= Math.abs(x/10);
     brahServo.setAngle(servoDegree);
   }
   SmartDashboard.putNumber("ServoDegree",  servoDegree);
