@@ -6,14 +6,15 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
+import com.revrobotics.jni.VL53L0XJNI;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.*;
 import com.revrobotics.Rev2mDistanceSensor.Port;
 
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
   private Rev2mDistanceSensor distOnboard; 
   private Rev2mDistanceSensor distMXP;
 
@@ -24,8 +25,9 @@ public class Robot extends IterativeRobot {
      * or the MXP port. Both can run simultaneously.
      */
     distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
-    distMXP = new Rev2mDistanceSensor(Port.kMXP);
+    //distMXP = new Rev2mDistanceSensor(Port.kMXP);
   }
+
 
   @Override
   public void robotPeriodic() {}
@@ -57,10 +59,10 @@ public class Robot extends IterativeRobot {
       SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
     }
 
-    if(distMXP.isRangeValid()) {
-      SmartDashboard.putNumber("Range MXP", distMXP.getRange());
-      SmartDashboard.putNumber("Timestamp MXP", distMXP.getTimestamp());
-    }
+    // if(distMXP.isRangeValid()) {
+    //   SmartDashboard.putNumber("Range MXP", distMXP.getRange());
+    //   SmartDashboard.putNumber("Timestamp MXP", distMXP.getTimestamp());
+    // }
   }
 
   @Override
@@ -73,6 +75,6 @@ public class Robot extends IterativeRobot {
      * This will command any active sensors to terminate current measurements
      * and the thread will stop.
      */
-    distOnboard.setAutomaticMode(false);
+    //distOnboard.setAutomaticMode(false);
   }
 }
