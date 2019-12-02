@@ -35,10 +35,17 @@ import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.*;
 
+import edu.wpi.first.wpilibj.Encoder;
+
 import frc.robot.subsystems.SmartDash;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-
+import edu.wpi.first.wpilibj.MotorSafety;
+import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.PWMSpeedController;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
 
 public class Robot extends TimedRobot {
 
@@ -51,11 +58,14 @@ public class Robot extends TimedRobot {
   private static final int leftBackDeviceID = 3;
   private static final int rightFrontDeviceID = 5;
   private static final int rightBackDeviceID = 2;
+  private static final int turretDeviceID = 6;
   private static final int kServoID = 7;
   private CANSparkMax m_leftFrontMotor;
   private CANSparkMax m_leftBackMotor;
   private CANSparkMax m_rightFrontMotor;
   private CANSparkMax m_rightBackMotor;
+  private VictorSPX m_turretMotor;
+  private Encoder m_turretEncoder;
   private CANEncoder m_leftBackEncoder;
   private CANEncoder m_leftFrontEncoder;                                                                                 
   private CANEncoder m_rightBackEncoder;
@@ -72,6 +82,8 @@ public class Robot extends TimedRobot {
   
   Compressor m_compressor = new Compressor(0);
   DoubleSolenoid solenoidDouble = new DoubleSolenoid(1, 2);
+
+  // CANTalon m_turretEncoder = new CANTalon();
 
   public UsbCamera drive;
   public VideoMode videoMode;
@@ -98,6 +110,8 @@ public class Robot extends TimedRobot {
     m_leftBackMotor = new CANSparkMax(leftBackDeviceID, MotorType.kBrushless);
     m_rightFrontMotor = new CANSparkMax(rightFrontDeviceID, MotorType.kBrushless);
     m_rightBackMotor = new CANSparkMax(rightBackDeviceID, MotorType.kBrushless);
+    
+    m_turretMotor = new VictorSPX(turretDeviceID);
 
     brahServo = new Servo(kServoID);
     
@@ -107,6 +121,8 @@ public class Robot extends TimedRobot {
     m_leftBackEncoder = m_leftBackMotor.getEncoder();
     m_rightFrontEncoder = m_rightFrontMotor.getEncoder();
     m_rightBackEncoder = m_rightBackMotor.getEncoder();
+    
+    
 
     m_compressor.setClosedLoopControl(true);
 
@@ -196,6 +212,9 @@ public class Robot extends TimedRobot {
   if (m_leftStick.getRawButton(3)){
     ahrs.reset();
   }
+  if(m_leftStick.getRawButton(13)){
+    m_turretEncoder.setPo(8);
+  }
 
 
   if(m_leftStick.getRawButton(9)){
@@ -238,10 +257,10 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
     SmartDashboard.putNumber(   "Angle",             ahrs.getAngle());
 
-    // SmartDashboard.putNumber("Front Left", m_leftFrontEncoder.getPosition());
-    // SmartDashboard.putNumber("Front Right", m_rightFrontEncoder.getPosition());
-    // SmartDashboard.putNumber("Back Left", m_leftBackEncoder.getPosition());
-    // SmartDashboard.putNumber("Back Right", m_rightBackEncoder.getPosition());
+     SmartDashboard.putNumber("Front Left", m_leftFrontEncoder.getPosition());
+     SmartDashboard.putNumber("Front Right", m_rightFrontEncoder.getPosition());
+     SmartDashboard.putNumber("Back Left", m_leftBackEncoder.getPosition());
+     SmartDashboard.putNumber("Back Right", m_rightBackEncoder.getPosition());
 
     // SmartDashboard.putNumber("Front Right Power", m_rightFrontEncoder.getVelocity());
     // SmartDashboard.putNumber("Back Right Power", m_rightBackEncoder.getVelocity());
