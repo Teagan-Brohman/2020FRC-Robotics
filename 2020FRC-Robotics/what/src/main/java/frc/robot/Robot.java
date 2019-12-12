@@ -25,7 +25,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SolenoidBase;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -60,6 +62,7 @@ public class Robot extends TimedRobot {
   private static final int rightBackDeviceID = 2;
   private static final int turretDeviceID = 6;
   private static final int kServoID = 7;
+  private static double turretPower = 0.0;
   private CANSparkMax m_leftFrontMotor;
   private CANSparkMax m_leftBackMotor;
   private CANSparkMax m_rightFrontMotor;
@@ -83,6 +86,9 @@ public class Robot extends TimedRobot {
   Compressor m_compressor = new Compressor(0);
   DoubleSolenoid solenoidDouble = new DoubleSolenoid(1, 2);
 
+
+  DigitalInput limitSwitch = new DigitalInput(1);
+  AnalogPotentiometer pot = new AnalogPotentiometer(1);
   // CANTalon m_turretEncoder = new CANTalon();
 
   public UsbCamera drive;
@@ -117,7 +123,7 @@ public class Robot extends TimedRobot {
     
     m_myRobot = new MecanumDrive(m_leftFrontMotor, m_leftBackMotor, m_rightFrontMotor, m_rightBackMotor);
 
-    m_leftBackEncoder = m_leftFrontMotor.getEncoder();
+    m_leftFrontEncoder = m_leftFrontMotor.getEncoder();
     m_leftBackEncoder = m_leftBackMotor.getEncoder();
     m_rightFrontEncoder = m_rightFrontMotor.getEncoder();
     m_rightBackEncoder = m_rightBackMotor.getEncoder();
@@ -129,6 +135,10 @@ public class Robot extends TimedRobot {
     drive = CameraServer.getInstance().startAutomaticCapture();
     videoMode = new VideoMode(PixelFormat.kYUYV, 800, 448, 30);
     
+
+    if(limitSwitch.get()){
+      System.out.println("ya dumb");
+    }
     
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
@@ -157,8 +167,8 @@ public class Robot extends TimedRobot {
     xValue = m_leftStick.getX();
     zValue = m_leftStick.getZ();
     
-    xValue = xValue/2;
-    yValue = yValue/2;
+    xValue = xValue;
+    yValue = yValue;
     zValue = zValue/4;
 
     if(xValue < 0.05 && xValue > -0.05){
@@ -167,37 +177,38 @@ public class Robot extends TimedRobot {
     if(yValue < 0.05 && yValue > -0.05){
       yValue = 0;
     }
-    if(zValue < 0.05 && zValue > -0.05){
+    if(zValue < 0.05 && zValue > -0.05)
+     {
       zValue = 0;
     }
     
 
     roboGyro = ahrs.getAngle();
 
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx"); 
-    double x = tx.getDouble(0.0);
-    SmartDashboard.putNumber("LimelightX",  x);
+    // NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    // NetworkTableEntry tx = table.getEntry("tx"); 
+    // double x = tx.getDouble(0.0);
+    // SmartDashboard.putNumber("LimelightX",  x);
 
-    drive.setFPS(30);
-    drive.setVideoMode(videoMode);
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").setNumber(2);
+    // drive.setFPS(30);
+    // drive.setVideoMode(videoMode);
+    // NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").setNumber(2);
 
-    if(m_leftStick.getRawButton(1)){ //trigger pressed
-      if(x > 0){
-        m_myRobot.driveCartesian(-(Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
-      }
-      else if(x < 0){
-        m_myRobot.driveCartesian((Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
-      }
-      else{
-        m_myRobot.driveCartesian(0, 0, 0, 0);
-      }
-    }
-    else{//Trigger not pressed = normal drive
-      m_myRobot.driveCartesian(-xValue, yValue, -zValue, -roboGyro);
+    // if(m_leftStick.getRawButton(1)){ //trigger pressed
+    //   if(x > 0){
+    //     m_myRobot.driveCartesian(-(Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
+    //   }
+    //   else if(x < 0){
+    //     m_myRobot.driveCartesian((Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
+    //   }
+    //   else{
+    //     m_myRobot.driveCartesian(0, 0, 0, 0);
+    //   }
+    // }
+    // else{//Trigger not pressed = normal drive
+      m_myRobot.driveCartesian(xValue, -yValue, zValue, -roboGyro);
 
-    }
+    //}
   
     if(m_leftStick.getRawButton(11)){
       solenoidDouble.set(DoubleSolenoid.Value.kForward);
@@ -213,22 +224,40 @@ public class Robot extends TimedRobot {
     ahrs.reset();
   }
   if(m_leftStick.getRawButton(13)){
-    m_turretEncoder.setPo(8);
+    //m_turretEncoder.setPosition(8);
   }
 
+// if(m_leftStick.getRawButton(9)){
+//   if(m_turretEncoder.getRaw() > 0){
+//     turretPower = 0.25;
+//   } else if(m_turretEncoder.getRaw() < 0){
+//     turretPower = -0.25;
+//   } 
+// }
+// else{
+//   if(x > 4){
+//     turretPower += Math.abs(x/150);
+//   } else if(x < -4){
+//     turretPower -= Math.abs(x/150);
+//   } else{
+//     turretPower = 0;
+//   }
+// }
+  //m_turretMotor.set(ControlMode.PercentOutput, turretPower);
 
-  if(m_leftStick.getRawButton(9)){
-    brahServo.setAngle(90);
-  }
-  servoDegree = brahServo.getAngle();
-  if(x > 4){
-    servoDegree += Math.abs(x/10);//.8
-    brahServo.setAngle(servoDegree);
-  }
-  if(x < -4){
-    servoDegree -= Math.abs(x/10);
-    brahServo.setAngle(servoDegree);
-  }
+  // //Spinning the turret and makeing a "reset Button"
+  // if(m_leftStick.getRawButton(9)){
+  //   brahServo.setAngle(90);
+  // }
+  // servoDegree = brahServo.getAngle();
+  // if(x > 4){
+  //   servoDegree += Math.abs(x/10);//.8
+  //   brahServo.setAngle(servoDegree);
+  // }
+  // if(x < -4){
+  //   servoDegree -= Math.abs(x/10);
+  //   brahServo.setAngle(servoDegree);
+  // }
   SmartDashboard.putNumber("ServoDegree",  servoDegree);
   
   // if(m_leftStick.getRawButton(5)){
@@ -261,6 +290,7 @@ public class Robot extends TimedRobot {
      SmartDashboard.putNumber("Front Right", m_rightFrontEncoder.getPosition());
      SmartDashboard.putNumber("Back Left", m_leftBackEncoder.getPosition());
      SmartDashboard.putNumber("Back Right", m_rightBackEncoder.getPosition());
+     //SmartDashboard.putNumber("Turret", m_turretEncoder.getRaw());
 
     // SmartDashboard.putNumber("Front Right Power", m_rightFrontEncoder.getVelocity());
     // SmartDashboard.putNumber("Back Right Power", m_rightBackEncoder.getVelocity());
