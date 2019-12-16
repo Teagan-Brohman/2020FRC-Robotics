@@ -10,9 +10,13 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.Rev2mDistanceSensor;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.Rev2mDistanceSensor.Port;
 
+
+//import frc.robot.subsystems.Rev2Meter;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -22,14 +26,16 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.i2cSubclass;
+//import frc.robot.subsystems.i2cSubclass;
 import frc.robot.subsystems.TCS34725_I2C.TransferAbortedException;
 //import edu.wpi.first.wpilibj.ADXL345_I2C;
 import edu.wpi.first.wpilibj.I2C;
 import frc.robot.subsystems.TCS34725_I2C.TCSColor;
 import frc.robot.subsystems.TCS34725_I2C;
+import frc.robot.subsystems.i2cSubclass;
+
 //import frc.robot.subsystems.LidarProxy;
-//import com.revrobotics.*;
+import com.revrobotics.*;
 //import com.revrobotics.Rev2mDistanceSensor.Port;
 
 public class Robot extends TimedRobot {
@@ -38,11 +44,11 @@ public class Robot extends TimedRobot {
   AHRS ahrs;
   private MecanumDrive m_myRobot;
   private Joystick m_leftStick;
-  public static final int kGamepadButtonA = 1;
-  private static final int leftFrontDeviceID = 1;
-  private static final int leftBackDeviceID = 3;
-  private static final int rightFrontDeviceID = 5;
-  private static final int rightBackDeviceID = 2;
+  public final int kGamepadButtonA = 1;
+  private final int leftFrontDeviceID = 1;
+  private final int leftBackDeviceID = 3;
+  private final int rightFrontDeviceID = 5;
+  private final int rightBackDeviceID = 2;
   private CANSparkMax m_leftFrontMotor;
   private CANSparkMax m_leftBackMotor;
   private CANSparkMax m_rightFrontMotor;
@@ -79,9 +85,11 @@ public class Robot extends TimedRobot {
 
   Double[] smartdashPointer;
 
+  
 
-  TCS34725_I2C colorSensor = new TCS34725_I2C(I2C.Port.kOnboard);
-  TCSColor colorData = new TCSColor(red, blue, green, c);
+  // TCS34725_I2C colorSensor = new TCS34725_I2C(I2C.Port.kOnboard);
+  // TCSColor colorData = new TCSColor(red, blue, green, c);
+  
 
   @Override
   public void robotInit() {
@@ -120,12 +128,11 @@ public class Robot extends TimedRobot {
     m_compressor.setClosedLoopControl(true);
 
     
-
-    try {
-      colorSensor.initialize(0xEB, 0x00);
-    } catch (TransferAbortedException | InterruptedException e2) {
+    // try {
+    //   colorSensor.initialize(0xEB, 0x00);
+    // } catch (TransferAbortedException | InterruptedException e2) {
     
-    }
+    // }
 
     
 
@@ -248,15 +255,21 @@ public class Robot extends TimedRobot {
      // }
       
    // }
-      try {
-      colorSensor.getRawData();
+    //   try {
+    //   colorSensor.getRawData();
       
-       } catch (TransferAbortedException e1) {
-    }
-      SmartDashboard.putNumber("Color Red: ", red);
-      SmartDashboard.putNumber("Color Blue", blue);
-      SmartDashboard.putNumber("Color Green", green);
-      //i2cSubclass.getRange();
+    //    } catch (TransferAbortedException e1) {
+    // }
+    //   SmartDashboard.putNumber("Color Red: ", red);
+    //   SmartDashboard.putNumber("Color Blue", blue);
+    //   SmartDashboard.putNumber("Color Green", green);
+      //i2cSubclass.getRange;
+      // if (distOnboard.isRangeValid()) {
+      //   SmartDashboard.putNumber("Range Onboard", distOnboard.getRange());
+      //   SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
+      //   }
+
+        //i2cSubclass.getRange();
 
     SmartDashboard.updateValues();
   }

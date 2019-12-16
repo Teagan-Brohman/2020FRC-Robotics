@@ -15,7 +15,7 @@ import com.revrobotics.Rev2mDistanceSensor.Port;
 
 public class Robot extends IterativeRobot {
   private Rev2mDistanceSensor distOnboard; 
-  private Rev2mDistanceSensor distMXP;
+  //private Rev2mDistanceSensor distMXP;
 
   @Override
   public void robotInit() {
@@ -24,7 +24,7 @@ public class Robot extends IterativeRobot {
      * or the MXP port. Both can run simultaneously.
      */
     distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
-    distMXP = new Rev2mDistanceSensor(Port.kMXP);
+    //distMXP = new Rev2mDistanceSensor(Port.kMXP);
   }
 
   @Override
@@ -57,10 +57,10 @@ public class Robot extends IterativeRobot {
       SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
     }
 
-    if(distMXP.isRangeValid()) {
-      SmartDashboard.putNumber("Range MXP", distMXP.getRange());
-      SmartDashboard.putNumber("Timestamp MXP", distMXP.getTimestamp());
-    }
+    //if(distMXP.isRangeValid()) {
+      //SmartDashboard.putNumber("Range MXP", distMXP.getRange());
+      //SmartDashboard.putNumber("Timestamp MXP", distMXP.getTimestamp());
+    //}
   }
 
   @Override

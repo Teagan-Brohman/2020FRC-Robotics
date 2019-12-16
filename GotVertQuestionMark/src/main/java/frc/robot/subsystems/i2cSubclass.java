@@ -1,13 +1,13 @@
 
 package frc.robot.subsystems;
-import edu.wpi.first.wpilibj.I2C;
-//import edu.wpi.first.wpilibj.I2C.Port;
+
+import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.*;
 import com.revrobotics.Rev2mDistanceSensor.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public abstract class i2cSubclass extends TimedRobot {
+public class i2cSubclass extends IterativeRobot {
 	private static Rev2mDistanceSensor distOnboard;
 
 	// private static I2C Wire = new I2C(Port.kOnboard, 4);
@@ -18,16 +18,20 @@ public abstract class i2cSubclass extends TimedRobot {
 	// }
 
 	// methods
+	@Override
 	public void robotInit() {
 		/**
 		 * Rev 2m distance sensor can be initialized with the Onboard I2C port or the
 		 * MXP port. Both can run simultaneously.
 		 */
 		distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
-		distOnboard.setAutomaticMode(true);
 	}
 
 	public static void getRange() {
+
+		
+		Rev2mDistanceSensor distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
+
 		if (distOnboard.isRangeValid()) {
 		SmartDashboard.putNumber("Range Onboard", distOnboard.getRange());
 		SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
