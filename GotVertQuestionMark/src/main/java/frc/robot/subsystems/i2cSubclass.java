@@ -6,9 +6,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.*;
 import com.revrobotics.Rev2mDistanceSensor.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.jni.VL53L0XJNI;
 
-public class i2cSubclass extends IterativeRobot {
-	private static Rev2mDistanceSensor distOnboard;
+public class i2cSubclass{
+	// Rev2mDistanceSensor distOnboard;
 
 	// private static I2C Wire = new I2C(Port.kOnboard, 4);
 	// private static final int MAX_BYTES = 32;
@@ -16,36 +17,35 @@ public class i2cSubclass extends IterativeRobot {
 	// while(true){
 	// Wire.read(, count, buffer)
 	// }
-
+//private Rev2mDistanceSensor distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
 	// methods
-	@Override
-	public void robotInit() {
-		/**
-		 * Rev 2m distance sensor can be initialized with the Onboard I2C port or the
-		 * MXP port. Both can run simultaneously.
-		 */
-		distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
-	}
-
-	public static void getRange() {
+	
+	// public void getRange() {
 
 		
-		Rev2mDistanceSensor distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
+	// 	Rev2mDistanceSensor distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
 
-		if (distOnboard.isRangeValid()) {
-		SmartDashboard.putNumber("Range Onboard", distOnboard.getRange());
-		SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
-	  }
-  
-}
+	// 	if (distOnboard.isRangeValid()) {
+	// 	SmartDashboard.putNumber("Range Onboard", distOnboard.getRange());
+	// 	SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
+	//   }
+	  
+ 	// public double getRange() {
+    //     return distOnboard.getRange();
+    // }
+ 
+	
 
-public void disabledInit() {
+
+	
+
+	public void disabledInit() {
     /**
      * The background thread may be stopped by calling setAutomaticMode(false).
      * This will command any active sensors to terminate current measurements
      * and the thread will stop.
      */
-    distOnboard.setAutomaticMode(false);
+    //distOnboard.setAutomaticMode(false);
   }
 
 // public void MuxPortBegin(byte deviceAddress) 

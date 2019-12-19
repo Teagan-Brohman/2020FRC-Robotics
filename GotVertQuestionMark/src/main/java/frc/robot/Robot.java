@@ -36,8 +36,9 @@ import frc.robot.subsystems.i2cSubclass;
 
 //import frc.robot.subsystems.LidarProxy;
 import com.revrobotics.*;
-//import com.revrobotics.Rev2mDistanceSensor.Port;
-
+import com.revrobotics.Rev2mDistanceSensor.Port;
+import com.revrobotics.jni.VL53L0XJNI;
+//import edu.team997.first.wpilibj.*;
 public class Robot extends TimedRobot {
 
   // private AHRS ahrs;
@@ -85,10 +86,12 @@ public class Robot extends TimedRobot {
 
   Double[] smartdashPointer;
 
+  //private i2cSubclass sensor;
   
+  //private Rev2mDistanceSensor distOnboard;
 
-  // TCS34725_I2C colorSensor = new TCS34725_I2C(I2C.Port.kOnboard);
-  // TCSColor colorData = new TCSColor(red, blue, green, c);
+  //  TCS34725_I2C colorSensor = new TCS34725_I2C(I2C.Port.kOnboard);
+  //  TCSColor colorData = new TCSColor(red, blue, green, c);
   
 
   @Override
@@ -127,7 +130,9 @@ public class Robot extends TimedRobot {
 
     m_compressor.setClosedLoopControl(true);
 
-    
+   // i2cSubclass sensor = new i2cSubclass();
+
+   // distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
     // try {
     //   colorSensor.initialize(0xEB, 0x00);
     // } catch (TransferAbortedException | InterruptedException e2) {
@@ -142,7 +147,7 @@ public class Robot extends TimedRobot {
     //   colorSensor.enable();
     // } catch (TransferAbortedException | InterruptedException e) {
       
-    // }
+    //  }
     
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
@@ -165,7 +170,7 @@ public class Robot extends TimedRobot {
     Double gyroCalibrating = (double)(ahrs.isCalibrating() ? 1.0 : 0.0);
     Double compressorEnable = (double)(m_compressor.enabled() ? 1.0 : 0.0);
     Double pressureSwitch = (double)(m_compressor.getPressureSwitchValue() ? 1.0 : 0.0);
-
+   
       smartdashBooleans = new String[] { //input the name that you want the box to have here.
         "IMU_Yaw",
         "IMU_Pitch",
@@ -198,17 +203,17 @@ public class Robot extends TimedRobot {
     xValue = m_leftStick.getX();
     zValue = m_leftStick.getZ();
     
-    xValue = xValue/2;
-    yValue = yValue/2;
+    xValue = xValue/4;
+    yValue = yValue/4;
     zValue = zValue/4;
 
-    if(xValue < 0.05 && xValue > -0.05){
+    if(xValue < 0.05 && xValue > -0.1){
       xValue = 0;
     }
-    if(yValue < 0.05 && yValue > -0.05){
+    if(yValue < 0.05 && yValue > -0.1){
       yValue = 0;
     }
-    if(zValue < 0.05 && zValue > -0.05){
+    if(zValue < 0.05 && zValue > -0.1){
       zValue = 0;
     }
 
@@ -219,7 +224,7 @@ public class Robot extends TimedRobot {
       m_myRobot.driveCartesian(-xPower, -yPower, 0, -roboGyro);
     }
     else{//Trigger not pressed = normal drive
-      m_myRobot.driveCartesian(-xValue, yValue, -zValue, -roboGyro);
+      m_myRobot.driveCartesian(-xValue, yValue, zValue, -roboGyro);
       Update_Limelight_Tracking();
     }
     
@@ -260,17 +265,20 @@ public class Robot extends TimedRobot {
       
     //    } catch (TransferAbortedException e1) {
     // }
-    //   SmartDashboard.putNumber("Color Red: ", red);
-    //   SmartDashboard.putNumber("Color Blue", blue);
-    //   SmartDashboard.putNumber("Color Green", green);
-      //i2cSubclass.getRange;
+      // SmartDashboard.putNumber("Color Red: ", red);
+      // SmartDashboard.putNumber("Color Blue", blue);
+      // SmartDashboard.putNumber("Color Green", green);
+      //i2cSubclass.getRange();
       // if (distOnboard.isRangeValid()) {
       //   SmartDashboard.putNumber("Range Onboard", distOnboard.getRange());
       //   SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
-      //   }
-
-        //i2cSubclass.getRange();
-
+      // //   }
+      // if(distOnboard.isRangeValid()) {
+      //   SmartDashboard.putNumber("Range Onboard", distOnboard.getRange());
+      //   SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
+      // }
+      
+   
     SmartDashboard.updateValues();
   }
   else{ //when debug mode is off this will delete all the stuff off your smartDashboard.
@@ -342,3 +350,5 @@ public void sleep(int milliseconds){
 }
 }
 } 
+
+
