@@ -48,6 +48,8 @@ import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
+import com.revrobotics.ControlType;
+import com.revrobotics.CANPIDController;
 
 public class Robot extends TimedRobot {
 
@@ -67,13 +69,16 @@ public class Robot extends TimedRobot {
   private CANSparkMax m_leftBackMotor;
   private CANSparkMax m_rightFrontMotor;
   private CANSparkMax m_rightBackMotor;
-  private VictorSPX m_turretMotor;
-  private Encoder m_turretEncoder;
+  private CANSparkMax m_turretMotor;
+  private CANEncoder m_turretEncoder;
+  private CANPIDController m_pidController;
+  public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
   private CANEncoder m_leftBackEncoder;
   private CANEncoder m_leftFrontEncoder;                                                                                 
   private CANEncoder m_rightBackEncoder;
   private CANEncoder m_rightFrontEncoder;
   private Servo brahServo;
+ 
  
   
   public double yValue;
@@ -117,7 +122,27 @@ public class Robot extends TimedRobot {
     m_rightFrontMotor = new CANSparkMax(rightFrontDeviceID, MotorType.kBrushless);
     m_rightBackMotor = new CANSparkMax(rightBackDeviceID, MotorType.kBrushless);
     
-    m_turretMotor = new VictorSPX(turretDeviceID);
+    m_turretMotor = new CANSparkMax(turretDeviceID, MotorType.kBrushed);
+
+   
+    // m_pidController = m_turretMotor.getPIDController();
+    m_turretEncoder= m_turretMotor.getEncoder(SensorType.kEncoder, 1440);
+
+
+    // kP = 0.1; 
+    // kI = 1e-4;
+    // kD = 1; 
+    // kIz = 0; 
+    // kFF = 0; 
+    // kMaxOutput = 1; 
+    // kMinOutput = -1;
+
+    // m_pidController.setP(kP);
+    // m_pidController.setI(kI);
+    // m_pidController.setD(kD);
+    // m_pidController.setIZone(kIz);
+    // m_pidController.setFF(kFF);
+    // m_pidController.setOutputRange(kMinOutput, kMaxOutput);
 
     brahServo = new Servo(kServoID);
     
@@ -163,13 +188,39 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
+    // double p = SmartDashboard.getNumber("P Gain", 0);
+    // double i = SmartDashboard.getNumber("I Gain", 0);
+    // double d = SmartDashboard.getNumber("D Gain", 0);
+    // double iz = SmartDashboard.getNumber("I Zone", 0);
+    // double ff = SmartDashboard.getNumber("Feed Forward", 0);
+    // double max = SmartDashboard.getNumber("Max Output", 0);
+    // double min = SmartDashboard.getNumber("Min Output", 0);
+    // double rotations = SmartDashboard.getNumber("Set Rotations", 0);
+
+    // if PID coefficients on SmartDashboard have changed, write new values to controller
+    // if((p != kP)) { m_pidController.setP(p); kP = p; }
+    // if((i != kI)) { m_pidController.setI(i); kI = i; }
+    // if((d != kD)) { m_pidController.setD(d); kD = d; }
+    // if((iz != kIz)) { m_pidController.setIZone(iz); kIz = iz; }
+    // if((ff != kFF)) { m_pidController.setFF(ff); kFF = ff; }
+    // if((max != kMaxOutput) || (min != kMinOutput)) { 
+    //   m_pidController.setOutputRange(min, max); 
+    //   kMinOutput = min; kMaxOutput = max; 
+
+    //   m_pidController.setReference(rotations, ControlType.kPosition);
+
+    //   SmartDashboard.putNumber("SetPoint", rotations);
+      SmartDashboard.putNumber("ProcessVariable", m_turretEncoder.getPosition());
+      SmartDashboard.putNumber("CPR", m_turretEncoder.getCPR());
+      
+
     yValue = m_leftStick.getY();
     xValue = m_leftStick.getX();
     zValue = m_leftStick.getZ();
     
     xValue = xValue;
     yValue = yValue;
-    zValue = zValue/4;
+    zValue = zValue/3;
 
     if(xValue < 0.05 && xValue > -0.05){
       xValue = 0;
@@ -177,38 +228,46 @@ public class Robot extends TimedRobot {
     if(yValue < 0.05 && yValue > -0.05){
       yValue = 0;
     }
-    if(zValue < 0.05 && zValue > -0.05)
-     {
+    if(zValue < 0.05 && zValue > -0.05){
       zValue = 0;
     }
     
+    if(m_leftStick.getRawButton(10)){
+      m_turretMotor.set(0.5);
+    }
+    else if(m_leftStick.getRawButton(9)){
+      m_turretMotor.set(-0.5);
+    }
+    else{
+      m_turretMotor.set(0);
+    }
 
     roboGyro = ahrs.getAngle();
 
-    // NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    // NetworkTableEntry tx = table.getEntry("tx"); 
-    // double x = tx.getDouble(0.0);
-    // SmartDashboard.putNumber("LimelightX",  x);
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = table.getEntry("tx"); 
+    double x = tx.getDouble(0.0);
+    SmartDashboard.putNumber("LimelightX",  x);
 
-    // drive.setFPS(30);
-    // drive.setVideoMode(videoMode);
-    // NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").setNumber(2);
+    drive.setFPS(30);
+    drive.setVideoMode(videoMode);
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").setNumber(2);
 
-    // if(m_leftStick.getRawButton(1)){ //trigger pressed
-    //   if(x > 0){
-    //     m_myRobot.driveCartesian(-(Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
-    //   }
-    //   else if(x < 0){
-    //     m_myRobot.driveCartesian((Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
-    //   }
-    //   else{
-    //     m_myRobot.driveCartesian(0, 0, 0, 0);
-    //   }
-    // }
-    // else{//Trigger not pressed = normal drive
+    if(m_leftStick.getRawButton(1)){ //trigger pressed
+      if(x > 0){
+        m_myRobot.driveCartesian(-(Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
+      }
+      else if(x < 0){
+        m_myRobot.driveCartesian((Math.pow((0.025 * x), 2)), yValue, 0, -roboGyro);
+      }
+      else{
+        m_myRobot.driveCartesian(0, 0, 0, 0);
+      }
+    }
+    else{//Trigger not pressed = normal drive
       m_myRobot.driveCartesian(xValue, -yValue, zValue, -roboGyro);
 
-    //}
+    }
   
     if(m_leftStick.getRawButton(11)){
       solenoidDouble.set(DoubleSolenoid.Value.kForward);
@@ -224,17 +283,20 @@ public class Robot extends TimedRobot {
     ahrs.reset();
   }
   if(m_leftStick.getRawButton(13)){
-    //m_turretEncoder.setPosition(8);
+     //m_turretEncoder.
   }
 
-// if(m_leftStick.getRawButton(9)){
-//   if(m_turretEncoder.getRaw() > 0){
-//     turretPower = 0.25;
-//   } else if(m_turretEncoder.getRaw() < 0){
-//     turretPower = -0.25;
-//   } 
-// }
-// else{
+
+if(m_leftStick.getRawButton(5)){
+  
+  
+  // if(m_turretEncoder.getPosition() > 0){
+  //   turretPower = 0.25;
+  // } else if(m_turretEncoder.getPosition() < 0){
+  //   turretPower = -0.25;
+  // } 
+}
+//else{
 //   if(x > 4){
 //     turretPower += Math.abs(x/150);
 //   } else if(x < -4){
@@ -243,7 +305,8 @@ public class Robot extends TimedRobot {
 //     turretPower = 0;
 //   }
 // }
-  //m_turretMotor.set(ControlMode.PercentOutput, turretPower);
+  
+//   m_turretMotor.set(ControlMode.PercentOutput, turretPower);
 
   // //Spinning the turret and makeing a "reset Button"
   // if(m_leftStick.getRawButton(9)){
@@ -258,7 +321,7 @@ public class Robot extends TimedRobot {
   //   servoDegree -= Math.abs(x/10);
   //   brahServo.setAngle(servoDegree);
   // }
-  SmartDashboard.putNumber("ServoDegree",  servoDegree);
+  //SmartDashboard.putNumber("ServoDegree",  servoDegree);
   
   // if(m_leftStick.getRawButton(5)){
   //   brahServo.setAngle(180);
@@ -276,8 +339,15 @@ public class Robot extends TimedRobot {
     // } catch( RuntimeException ex ) {
     // DriverStation.reportError("Error communicating with drive system:  " + ex.getMessage(), true);
     // }
-    
-
+  
+    SmartDashboard.putNumber("P Gain", kP);
+    SmartDashboard.putNumber("I Gain", kI);
+    SmartDashboard.putNumber("D Gain", kD);
+    SmartDashboard.putNumber("I Zone", kIz);
+    SmartDashboard.putNumber("Feed Forward", kFF);
+    SmartDashboard.putNumber("Max Output", kMaxOutput);
+    SmartDashboard.putNumber("Min Output", kMinOutput);
+    SmartDashboard.putNumber("Set Rotations", 0);
 
     SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
     SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
@@ -303,8 +373,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Compressor Current Value: ", m_compressor.getCompressorCurrent());
    
     //SmartDashboard.putNumber("Double Solanoid Value ", DoubleSolenoid.Value.kReverse);
-
+    
     SmartDashboard.updateValues();
+  
     //m_myRobot.tankDrive(m_leftStick.getX(), m_leftStick.getZ());
      //m_leftFrontMotor.set(m_leftStick.getY());
     // m_leftBackMotor.set(m_leftStick.getY());
