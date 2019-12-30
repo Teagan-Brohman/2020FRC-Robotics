@@ -17,6 +17,7 @@ import com.revrobotics.Rev2mDistanceSensor.Port;
 
 
 //import frc.robot.subsystems.Rev2Meter;
+import edu.team997.first.wpilibj.*;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -32,6 +33,7 @@ import frc.robot.subsystems.TCS34725_I2C.TransferAbortedException;
 import edu.wpi.first.wpilibj.I2C;
 import frc.robot.subsystems.TCS34725_I2C.TCSColor;
 import frc.robot.subsystems.TCS34725_I2C;
+
 import frc.robot.subsystems.i2cSubclass;
 
 //import frc.robot.subsystems.LidarProxy;
@@ -80,6 +82,7 @@ public class Robot extends TimedRobot {
   int blue;
   int green;
   int c;
+  int totalColor;
 
   String[] smartdashBooleans;
   String[] smartdashNumber;
@@ -90,9 +93,10 @@ public class Robot extends TimedRobot {
   
   //private Rev2mDistanceSensor distOnboard;
 
-  //  TCS34725_I2C colorSensor = new TCS34725_I2C(I2C.Port.kOnboard);
-  //  TCSColor colorData = new TCSColor(red, blue, green, c);
+    TCS34725_I2C colorSensor = new TCS34725_I2C();
+   // TCSColor colorData = new TCSColor(red, blue, green, c);
   
+    
 
   @Override
   public void robotInit() {
@@ -133,22 +137,17 @@ public class Robot extends TimedRobot {
    // i2cSubclass sensor = new i2cSubclass();
 
    // distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
-    // try {
-    //   colorSensor.initialize(0xEB, 0x00);
-    // } catch (TransferAbortedException | InterruptedException e2) {
-    
-    // }
-
-    
-
-    
-
-    // try {
-    //   colorSensor.enable();
-    // } catch (TransferAbortedException | InterruptedException e) {
+     try {
+       colorSensor.initialize(0xFF, 0x00);
+       colorSensor.enable();
+       //colorSensor.setIntegrationTime(0xEB);
+     }
+      catch (TransferAbortedException | InterruptedException e) {
+      }
       
-    //  }
     
+    
+     
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
      * in the SPARK MAX to their factory default state. If no argument is passed, these
@@ -246,10 +245,10 @@ public class Robot extends TimedRobot {
              
    if(m_leftStick.getRawButton(7)){
      debugVar = !debugVar;
-     sleep(400);
+     
    }
 
-    if (debugVar == true){ //Planning on adding a button on the smart dash to enable and disable the code(right now its button 7 on joystick), 
+    //if (debugVar == true){ //Planning on adding a button on the smart dash to enable and disable the code(right now its button 7 on joystick), 
                           //changing to this array version so we can remove all lines on the smartdash board at once. Still have to implement/test. 
       //if(dashboardFlag == false){
       //for(int i = 0; i < smartdashBooleans.length; i++){ //This is the thing that executes it
@@ -260,19 +259,28 @@ public class Robot extends TimedRobot {
      // }
       
    // }
-    //   try {
-    //   colorSensor.getRawData();
-      
-    //    } catch (TransferAbortedException e1) {
-    // }
-      // SmartDashboard.putNumber("Color Red: ", red);
-      // SmartDashboard.putNumber("Color Blue", blue);
-      // SmartDashboard.putNumber("Color Green", green);
+    
+    try {
+       red = colorSensor.getRawData().getR();
+       blue = colorSensor.getRawData().getB();
+       green = colorSensor.getRawData().getG();
+       totalColor = (red + blue + green)/3;
+     } catch (TransferAbortedException e) {
+     }
+
+       SmartDashboard.putNumber("Color Red: ", red);
+       SmartDashboard.putNumber("Color Blue", blue);
+       SmartDashboard.putNumber("Color Green", green);
+       SmartDashboard.putNumber("Total Color: ", totalColor);
+    //   SmartDashboard.getBoolean("Class true? ", debugVar);
+
+
       //i2cSubclass.getRange();
       // if (distOnboard.isRangeValid()) {
       //   SmartDashboard.putNumber("Range Onboard", distOnboard.getRange());
       //   SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
       // //   }
+
       // if(distOnboard.isRangeValid()) {
       //   SmartDashboard.putNumber("Range Onboard", distOnboard.getRange());
       //   SmartDashboard.putNumber("Timestamp Onboard", distOnboard.getTimestamp());
@@ -281,19 +289,19 @@ public class Robot extends TimedRobot {
    
     SmartDashboard.updateValues();
   }
-  else{ //when debug mode is off this will delete all the stuff off your smartDashboard.
+ // else{ //when debug mode is off this will delete all the stuff off your smartDashboard.
     //if(dashboardFlag == true){
     //dashboardFlag = false;
     //for(int i = 0; i < smartdashBooleans.length; i++){
     //SmartDashboard.delete(smartdashBooleans[i]);
-    SmartDashboard.delete("test");
-    SmartDashboard.updateValues();
+    //SmartDashboard.delete("test");
+    //SmartDashboard.updateValues();
     //}
 
     
  // }
-  }
-}
+//  }
+//}
 
   public void Update_Limelight_Tracking()
   {

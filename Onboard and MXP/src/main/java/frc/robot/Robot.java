@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
      * or the MXP port. Both can run simultaneously.
      */
     distOnboard = new Rev2mDistanceSensor(Port.kOnboard);
-    //distMXP = new Rev2mDistanceSensor(Port.kMXP);
+    distMXP = new Rev2mDistanceSensor(Port.kMXP);
   }
 
 
@@ -75,6 +75,6 @@ public class Robot extends TimedRobot {
      * This will command any active sensors to terminate current measurements
      * and the thread will stop.
      */
-    //distOnboard.setAutomaticMode(false);
+    distOnboard.setAutomaticMode(false);
   }
 }
